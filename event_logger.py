@@ -1,13 +1,13 @@
-"""CSC111 Project 1: Text Adventure Game - Event Logger
+"""CSC111 Assignment 1: Text Adventure Game - Event Logger
 
 Instructions (READ THIS FIRST!)
 ===============================
 
-This Python module contains the code for Project 1. Please consult
+This Python module contains the code for Assignment 1. Please consult
 the project handout for instructions and details.
 
-You can copy/paste your code from Assignment 1 into this file, and modify it as
-needed to work with your game.
+Do NOT modify any function/method headers, type contracts, etc. in this class (similar
+to CSC110 assignments).
 
 Copyright and Usage Information
 ===============================
@@ -20,15 +20,12 @@ please consult our Course Syllabus.
 
 This file is Copyright (c) 2026 CSC111 Teaching Team
 """
-
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
 
-# TODO: Copy/paste your A1 event_logger code below, and modify it if needed to fit your game
-
-
+# Note: We have completed the Event class for you. Do NOT modify it here for A1.
 @dataclass
 class Event:
     """
@@ -53,17 +50,20 @@ class EventList:
     A linked list of game events.
 
     Instance Attributes:
-        - # TODO add descriptions of instance attributes here
+        - first: Event object representing the first game event
+        - last: Event object representing the last game event
 
     Representation Invariants:
-        - # TODO add any appropriate representation invariants, if needed
+        - (self.first is None) == (self.last is None)
     """
     first: Optional[Event]
     last: Optional[Event]
 
+    # Note: You may ADD parameters/attributes/methods to this class as you see fit.
+    # But do not rename or remove any existing methods/attributes in this class
+
     def __init__(self) -> None:
         """Initialize a new empty event list."""
-
         self.first = None
         self.last = None
 
@@ -74,11 +74,9 @@ class EventList:
             print(f"Location: {curr.id_num}, Command: {curr.next_command}")
             curr = curr.next
 
-    # TODO: Complete the methods below, based on the given descriptions.
     def is_empty(self) -> bool:
         """Return whether this event list is empty."""
-
-        # TODO: Your code below
+        return self.first is None
 
     def add_event(self, event: Event, command: str = None) -> None:
         """
@@ -87,8 +85,19 @@ class EventList:
         event in the game.
         """
         # Hint: You should update the previous node's <next_command> as needed
-
-        # TODO: Your code below
+        if self.is_empty():
+            event.prev = None
+            event.next = None
+            event.next_command = None
+            self.first = event
+            self.last = event
+        else:
+            self.last.next_command = command
+            self.last.next = event
+            event.prev = self.last
+            event.next = None
+            event.next_command = None
+            self.last = event
 
     def remove_last_event(self) -> None:
         """
@@ -96,24 +105,37 @@ class EventList:
         If the list is empty, do nothing.
         """
         # Hint: The <next_command> and <next> attributes for the new last event should be updated as needed
+        if self.is_empty():
+            return
 
-        # TODO: Your code below
+        if self.first is self.last:
+            self.first = None
+            self.last = None
+            return
+
+        new_last = self.last.prev
+        new_last.next = None
+        new_last.next_command = None
+        self.last.prev = None
+        self.last = new_last
 
     def get_id_log(self) -> list[int]:
         """Return a list of all location IDs visited for each event in this list, in sequence."""
+        ids = []
+        curr = self.first
+        while curr is not None:
+            ids.append(curr.id_num)
+            curr = curr.next
+        return ids
 
-        # TODO: Your code below
 
-    # Note: You may add other methods to this class as needed
-
-
-if __name__ == "__main__":
-    pass
+if __name__ == '__main__':
     # When you are ready to check your work with python_ta, uncomment the following lines.
     # (Delete the "#" and space before each line.)
     # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
-    # import python_ta
-    # python_ta.check_all(config={
-    #     'max-line-length': 120,
-    #     'disable': ['R1705', 'E9998', 'E9999', 'static_type_checker']
-    # })
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'allowed-io': ['EventList.display_events'],
+        'disable': ['R1705', 'static_type_checker']
+    })

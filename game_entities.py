@@ -18,7 +18,7 @@ please consult our Course Syllabus.
 
 This file is Copyright (c) 2026 CSC111 Teaching Team
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -26,17 +26,18 @@ class Location:
     """A location in our text adventure game world.
 
     Instance Attributes:
-        - # TODO Describe each instance attribute here
+        - id_num: The unique numerical identifier for this location.
+        - brief_description: A short description shown on subsequent visits.
+        - long_description: A detailed description shown on first visit or when using 'look'.
+        - available_commands: A mapping from command strings to destination location IDs.
+        - items: A list of item names currently present at this location.
+        - visited: Whether the player has visited this location before.
+        - locked: Whether this location is locked and requires a key to enter.
 
     Representation Invariants:
-        - # TODO Describe any necessary representation invariants
+        - self.id_num >= 0
+        - all(loc_id >= 0 for loc_id in self.available_commands.values())
     """
-
-    # This is just a suggested starter class for Location.
-    # You may change/add parameters and the data available for each Location object as you see fit.
-    #
-    # The only thing you must NOT change is the name of this class: Location.
-    # All locations in your game MUST be represented as an instance of this class.
 
     id_num: int
     brief_description: str
@@ -51,30 +52,43 @@ class Item:
     """An item in our text adventure game world.
 
     Instance Attributes:
-        - # TODO Describe each instance attribute here
+        - name: The name of the item (lowercase).
+        - description: A description of the item shown when examining it.
+        - start_position: The location ID where this item starts.
+        - target_position: The location ID where depositing this item gives points (-1 if N/A).
+        - target_points: The number of points awarded for depositing at target location.
 
     Representation Invariants:
-        - # TODO Describe any necessary representation invariants
+        - self.start_position >= 0
+        - self.target_position >= -1
+        - self.target_points >= 0
     """
 
-    # NOTES:
-    # This is just a suggested starter class for Item.
-    # You may change these parameters and the data available for each Item object as you see fit.
-    # (The current parameters correspond to the example in the handout).
-    #
-    # The only thing you must NOT change is the name of this class: Item.
-    # All item objects in your game MUST be represented as an instance of this class.
-
     name: str
-    start_position: int
-    target_position: int
-    target_points: int
+    description: str = ""
+    start_position: int = 0
+    target_position: int = 0
+    target_points: int = 0
 
 
-# Note: Other entities you may want to add, depending on your game plan:
-# - Puzzle class to represent special locations (could inherit from Location class if it seems suitable)
-# - Player class
-# etc.
+@dataclass
+class Player:
+    """The player in our text adventure game.
+
+    Instance Attributes:
+        - inventory: A list of Item objects currently held by the player.
+        - score: The player's current score.
+        - moves_remaining: The number of moves the player has left before losing.
+
+    Representation Invariants:
+        - self.score >= 0
+        - self.moves_remaining >= 0
+    """
+
+    inventory: list[Item] = field(default_factory=list)
+    score: int = 0
+    moves_remaining: int = 40
+
 
 if __name__ == "__main__":
     pass

@@ -32,6 +32,7 @@ WINNING_LOCATION = 0  # Dorm room where items must be deposited
 # Note: You may add helper functions, classes, etc. below as needed
 
 #TESTING
+#again
 class AdventureGame:
     """A text adventure game class storing all location, item and map data.
 

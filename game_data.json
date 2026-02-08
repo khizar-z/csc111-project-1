@@ -1,24 +1,137 @@
 {
   "locations": [
     {
-      "id": 1,
-      "name": "Bahen 1F",
-      "brief_description": "You are on the first floor of the Bahen Center. There are elevators to the West, and an exit from the building to St. George street to the East. You see something shiny on the ground -- looks like a toonie?",
-      "long_description": "You are on the first floor of the Bahen Center. It's usually crowded at this time of the day, but today it's eerily quiet. Only a few students are studying at the table near the doors. You better not disturb them. One student is rushing down the corridor, wearing a heavy-looking backpack and carrying a textbook in their arms. There are elevators to the West, and an exit from the building to St. George street to the East.",
+      "id": 0,
+      "name": "Dorm Room",
+      "brief_description": "LOCATION 0\nYour dorm room. Your laptop sits on the desk, battery critically low.",
+      "long_description": "LOCATION 0\nYou are back in your dorm room. Your laptop sits on the desk, its battery icon flashing red at 5%. The project deadline is creeping closer. You need to find your USB drive, laptop charger, and lucky mug before it's too late! The door to the residence hallway is to the east.",
       "available_commands": {
-        "go south": 4,
-        "go east": 2
+        "go east": 1
       },
-      "items": ["toonie"]
+      "items": []
+    },
+    {
+      "id": 1,
+      "name": "Residence Hallway",
+      "brief_description": "LOCATION 1\nThe residence hallway. Your room is west, and the quad is to the east.",
+      "long_description": "LOCATION 1\nYou step into the residence hallway. The fluorescent lights flicker overhead. A few students shuffle past, looking equally sleep-deprived. Your dorm room is to the west. The main campus quad is accessible to the east, and the library is to the south.",
+      "available_commands": {
+        "go west": 0,
+        "go east": 2,
+        "go south": 4
+      },
+      "items": []
+    },
+    {
+      "id": 2,
+      "name": "Campus Quad",
+      "brief_description": "LOCATION 2\nThe open campus quad. Fresh air, but no time to enjoy it.",
+      "long_description": "LOCATION 2\nYou emerge into the campus quad. The February air is crisp and cold. A few students hurry past, bundled in winter coats. King's College Circle stretches out before you. The residence hallway is to the west, and you can see the coffee shop to the south.",
+      "available_commands": {
+        "go west": 1,
+        "go south": 5
+      },
+      "items": []
+    },
+    {
+      "id": 3,
+      "name": "Robarts Library 1F",
+      "brief_description": "LOCATION 3\nThe first floor of Robarts Library. Quiet and imposing.",
+      "long_description": "LOCATION 3\nYou enter the massive Robarts Library, its brutalist concrete walls towering above. The smell of old books and coffee fills the air. Study rooms are available to the south, and the Bahen Centre is accessible to the east. The exit leads north toward the hallway.",
+      "available_commands": {
+        "go north": 1,
+        "go south": 6,
+        "go east": 4
+      },
+      "items": []
+    },
+    {
+      "id": 4,
+      "name": "Bahen Centre 1F",
+      "brief_description": "LOCATION 4\nThe first floor of Bahen Centre. Computer science territory.",
+      "long_description": "LOCATION 4\nYou're in the Bahen Centre, home of the computer science department. Students rush past with heavy backpacks and tired eyes. The hum of laptops fills the air. You can go north to the residence hallway, west to Robarts, east to the coffee shop, or south to the lecture halls.",
+      "available_commands": {
+        "go north": 1,
+        "go west": 3,
+        "go east": 5,
+        "go south": 7
+      },
+      "items": []
+    },
+    {
+      "id": 5,
+      "name": "Coffee Shop",
+      "brief_description": "LOCATION 5\nThe campus coffee shop. The aroma of coffee is everywhere.",
+      "long_description": "LOCATION 5\nYou enter the cozy coffee shop. The barista looks at you knowingly - you're clearly not the first stressed student they've seen today. The smell of espresso fills the air. A small brass key sits forgotten on one of the tables. You can go north to the quad or west to Bahen Centre. There's also an office door to the south.",
+      "available_commands": {
+        "go north": 2,
+        "go west": 4,
+        "go south": 8
+      },
+      "items": ["key"]
+    },
+    {
+      "id": 6,
+      "name": "Robarts Study Room",
+      "brief_description": "LOCATION 6\nA quiet study room in Robarts Library.",
+      "long_description": "LOCATION 6\nYou slip into one of Robarts' private study rooms. The walls are covered with mathematical formulas and doodles left by previous occupants. Wait - is that your USB drive on the desk? You must have left it here during one of your late-night study sessions! The exit leads north back to the main library floor.",
+      "available_commands": {
+        "go north": 3
+      },
+      "items": ["usb drive"]
+    },
+    {
+      "id": 7,
+      "name": "Lecture Hall",
+      "brief_description": "LOCATION 7\nA large lecture hall in Bahen Centre.",
+      "long_description": "LOCATION 7\nYou enter a large lecture hall. Rows of seats cascade down toward a podium at the front. A few students are studying in the back rows. You spot a laptop charger plugged into an outlet near the front - that's yours! You must have left it after working on the project during yesterday's lecture. The exit leads north back to the Bahen Centre lobby.",
+      "available_commands": {
+        "go north": 4
+      },
+      "items": ["laptop charger"]
+    },
+    {
+      "id": 8,
+      "name": "T.A. Office",
+      "brief_description": "LOCATION 8\nThe T.A. office. A cluttered but cozy space.",
+      "long_description": "LOCATION 8\nYou enter the T.A. office. Papers and textbooks are stacked everywhere. On a shelf near the window, you spot your lucky U of T mug! One of the TAs must have found it and kept it here for safekeeping. The door leads north back to the coffee shop.",
+      "available_commands": {
+        "go north": 5
+      },
+      "items": ["lucky mug"],
+      "locked": true
     }
   ],
   "items": [
     {
-      "name": "toonie",
-      "description": "There is a toonie on the ground. Someone must have dropped it.",
-      "start_position": 1,
-      "target_position": 4,
-      "target_points": 5
+      "name": "usb drive",
+      "description": "Your USB drive containing the only copy of your project. You really should have backed this up.",
+      "start_position": 6,
+      "target_position": 0,
+      "target_points": 30
+    },
+    {
+      "name": "laptop charger",
+      "description": "Your laptop charger. Without this, your laptop will die before you can submit.",
+      "start_position": 7,
+      "target_position": 0,
+      "target_points": 30
+    },
+    {
+      "name": "lucky mug",
+      "description": "Your lucky U of T mug. You can't possibly submit without it watching over you.",
+      "start_position": 8,
+      "target_position": 0,
+      "target_points": 40
+    },
+    {
+      "name": "key",
+      "description": "A small brass key. It looks like it might open a door somewhere.",
+      "start_position": 5,
+      "target_position": -1,
+      "target_points": 0
     }
-  ]
+  ],
+  "max_moves": 40,
+  "winning_items": ["usb drive", "laptop charger", "lucky mug"]
 }

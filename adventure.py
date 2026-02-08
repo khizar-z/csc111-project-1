@@ -169,7 +169,6 @@ class AdventureGame:
         self.player.moves_remaining -= 1
 
 
-
 def handle_take_command(game: AdventureGame, item_name: str) -> str:
     """Handle the take command, picking up an item from the current location.
     Returns a message describing the result.
@@ -254,6 +253,7 @@ def print_location_description(location: Location, full: bool = False) -> None:
         print("\nYou see the following items here:")
         for item in location.items:
             print(f"  - {item}")
+
 
 if __name__ == "__main__":
     # When you are ready to check your work with python_ta, uncomment the following lines.

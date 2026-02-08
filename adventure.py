@@ -147,7 +147,6 @@ def handle_take_command(game: AdventureGame, item_name: str) -> str:
     # Remove from location and add to inventory
     location.items.remove(item_name)
     game.player.inventory.append(item)
-    game.player.score += 5  # Bonus points for picking up items
     return f"You picked up the {item_name}."
 
 

@@ -2,7 +2,6 @@
 
 Instructions (READ THIS FIRST!)
 ===============================
-wakqdhjwfwa
 This Python module contains the code for Project 1. Please consult
 the project handout for instructions and details.
 
@@ -282,7 +281,7 @@ if __name__ == "__main__":
         event = Event(location.id_num, location.long_description)
         game_log.add_event(event, choice)
 
-        # Depending on whether or not it's been visited before,
+        # Depending on whether, or not it's been visited before,
         #  print either full description (first time visit) or brief description (every subsequent visit) of location
         print()
         print_location_description(location)
@@ -314,6 +313,7 @@ if __name__ == "__main__":
         # Get and validate choice
         choice = input("\nEnter action: ").lower().strip()
 
+        # Simplify by tweaking the loop on line 326
         # Parse and validate command
         valid_command = False
         if choice in menu:
@@ -357,8 +357,7 @@ if __name__ == "__main__":
 
         # Handle movement commands
         elif choice in location.available_commands:
-            # TODO: handle movement commands
-            pass
+            self.current_location_id = location.available_commands[choice]
 
         # Handle take command
         elif choice.startswith("take "):

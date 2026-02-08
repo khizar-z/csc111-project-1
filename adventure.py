@@ -131,6 +131,76 @@ class AdventureGame:
         """Return a list of names of items in the player's inventory."""
         return [item.name for item in self.player.inventory]
 
+def handle_take_command(game: AdventureGame, item_name: str) -> str:
+    """Handle the take command, picking up an item from the current location.
+    Returns a message describing the result.
+    """
+    location = game.get_location()
+
+    if item_name not in location.items:
+        return f"There is no {item_name} here."
+
+    item = game.get_item_by_name(item_name)
+    if item is None:
+        return f"Unknown item: {item_name}"
+
+    # Remove from location and add to inventory
+    location.items.remove(item_name)
+    game.player.inventory.append(item)
+    game.player.score += 5  # Bonus points for picking up items
+    return f"You picked up the {item_name}."
+
+
+def handle_drop_command(game: AdventureGame, item_name: str) -> str:
+    """Handle the drop command, dropping an item at the current location.
+    Awards points if dropped at the target location.
+    Returns a message describing the result.
+    """
+    inventory_names = game.get_inventory_names()
+
+    if item_name not in inventory_names:
+        return f"You don't have a {item_name} in your inventory."
+
+    item = game.get_item_by_name(item_name)
+    location = game.get_location()
+
+    # Remove from inventory
+    game.player.inventory = [i for i in game.player.inventory if i.name != item_name]
+
+    # Check if this is the target location
+    if location.id_num == item.target_position:
+        game.player.score += item.target_points
+        return f"You deposited the {item_name}. +{item.target_points} points!"
+    else:
+        # Just drop at current location
+        location.items.append(item_name)
+        return f"You dropped the {item_name}."
+
+
+def handle_use_command(game: AdventureGame, item_name: str) -> str:
+    """Handle the use command for special items like keys.
+    Returns a message describing the result.
+    """
+    if item_name not in game.get_inventory_names():
+        return f"You don't have a {item_name} in your inventory."
+
+    if item_name == "key":
+        # Check if at a location adjacent to the locked T.A. office (location 8)
+        location = game.get_location()
+        if location.id_num == 5:  # Coffee shop, adjacent to office
+            office = game.get_location(8)
+            if office.locked:
+                office.locked = False
+                # Remove key from inventory
+                game.player.inventory = [i for i in game.player.inventory if i.name != "key"]
+                game.player.score += 10  # Bonus for solving puzzle
+                return "You unlock the T.A. office door with the key. The door swings open! +10 points!"
+            else:
+                return "The office door is already unlocked."
+        else:
+            return "There's nothing to unlock here."
+    else:
+        return f"You can't use the {item_name} here."
 
 if __name__ == "__main__":
     # When you are ready to check your work with python_ta, uncomment the following lines.

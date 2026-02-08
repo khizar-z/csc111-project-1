@@ -34,10 +34,15 @@ class AdventureGame:
     """A text adventure game class storing all location, item and map data.
 
     Instance Attributes:
-        - # TODO add descriptions of public instance attributes as needed
+        - current_location_id: The ID of the player's current location.
+        - ongoing: Whether the game is still in progress.
+        - player: The Player object tracking inventory, score, and moves.
+        - max_moves: The maximum number of moves allowed before losing.
+        - winning_items: List of item names required to win the game.
 
     Representation Invariants:
-        - # TODO add any appropriate representation invariants as needed
+        - self.current_location_id in self._locations
+        - self.max_moves > 0
     """
 
     # Private Instance Attributes (do NOT remove these two attributes):
@@ -49,6 +54,9 @@ class AdventureGame:
     _items: list[Item]
     current_location_id: int  # Suggested attribute, can be removed
     ongoing: bool  # Suggested attribute, can be removed
+    player: Player
+    max_moves: int
+    winning_items: list[Item]
 
     def __init__(self, game_data_file: str, initial_location_id: int) -> None:
         """

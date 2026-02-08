@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 from typing import Optional
 
-from game_entities import Location, Item
+from game_entities import Location, Item, Player
 from event_logger import Event, EventList
 
 
@@ -67,33 +67,47 @@ class AdventureGame:
         # 1. Make sure the Location class is used to represent each location.
         # 2. Make sure the Item class is used to represent each item.
 
-        # Suggested helper method (you can remove and load these differently if you wish to do so):
-        self._locations, self._items = self._load_game_data(game_data_file)
-
-        # Suggested attributes (you can remove and track these differently if you wish to do so):
-        self.current_location_id = initial_location_id  # game begins at this location
-        self.ongoing = True  # whether the game is ongoing
+        self._locations, self._items, self.max_moves, self.winning_items = self._load_game_data(game_data_file)
+        self.current_location_id = initial_location_id
+        self.ongoing = True
+        self.player = Player(inventory=[], score=0, moves_remaining=self.max_moves)
 
     @staticmethod
-    def _load_game_data(filename: str) -> tuple[dict[int, Location], list[Item]]:
+    def _load_game_data(filename: str) -> tuple[dict[int, Location], list[Item], int, list[str]]:
         """Load locations and items from a JSON file with the given filename and
         return a tuple consisting of (1) a dictionary of locations mapping each game location's ID to a Location object,
-        and (2) a list of all Item objects."""
+        (2) a list of all Item objects, (3) max moves, and (4) winning items list."""
 
         with open(filename, 'r') as f:
-            data = json.load(f)  # This loads all the data from the JSON file
+            data = json.load(f)
 
         locations = {}
-        for loc_data in data['locations']:  # Go through each element associated with the 'locations' key in the file
-            location_obj = Location(loc_data['id'], loc_data['brief_description'], loc_data['long_description'],
-                                    loc_data['available_commands'], loc_data['items'])
+        for loc_data in data['locations']:
+            location_obj = Location(
+                loc_data['id'],
+                loc_data['brief_description'],
+                loc_data['long_description'],
+                loc_data['available_commands'],
+                loc_data['items'].copy(),
+                False
+            )
             locations[loc_data['id']] = location_obj
 
         items = []
-        # TODO: Add Item objects to the items list; your code should be structured similarly to the loop above
-        # YOUR CODE BELOW
+        for item_data in data['items']:
+            item_obj = Item(
+                item_data['name'],
+                item_data.get('description', ''),
+                item_data['start_position'],
+                item_data['target_position'],
+                item_data['target_points']
+            )
+            items.append(item_obj)
 
-        return locations, items
+        max_moves = data.get('max_moves', 40)
+        winning_items = data.get('winning_items', [])
+
+        return locations, items, max_moves, winning_items
 
     def get_location(self, loc_id: Optional[int] = None) -> Location:
         """Return Location object associated with the provided location ID.
@@ -102,6 +116,20 @@ class AdventureGame:
 
         # TODO: Complete this method as specified
         # YOUR CODE BELOW
+        if loc_id is None:
+            return self._locations[self.current_location_id]
+        return self._locations[loc_id]
+
+    def get_item_by_name(self, name: str) -> Optional[Item]:
+        """Return the Item object with the given name, or None if not found."""
+        for item in self._items:
+            if item.name == name:
+                return item
+        return None
+
+    def get_inventory_names(self) -> list[str]:
+        """Return a list of names of items in the player's inventory."""
+        return [item.name for item in self.player.inventory]
 
 
 if __name__ == "__main__":

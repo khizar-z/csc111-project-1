@@ -251,11 +251,11 @@ if __name__ == "__main__":
     # When you are ready to check your work with python_ta, uncomment the following lines.
     # (Delete the "#" and space before each line.)
     # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
-    # import python_ta
-    # python_ta.check_all(config={
-    #     'max-line-length': 120,
-    #     'disable': ['R1705', 'E9998', 'E9999', 'static_type_checker']
-    # })
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'disable': ['R1705', 'E9998', 'E9999', 'static_type_checker']
+    })
 
     game_log = EventList()  # This is REQUIRED as one of the baseline requirements
     game = AdventureGame('game_data.json', 0)  # load data, setting initial location ID to 1
@@ -267,17 +267,17 @@ if __name__ == "__main__":
         # Note: If the loop body is getting too long, you should split the body up into helper functions
         # for better organization. Part of your mark will be based on how well-organized your code is.
 
-        location = game.get_location()
+        curr_loc = game.get_location()
 
         # Add new Event to game log to represent current game location
         #  Note that the <choice> variable should be the command which led to this event
-        event = Event(location.id_num, location.long_description)
+        event = Event(curr_loc.id_num, curr_loc.long_description)
         game_log.add_event(event, choice)
 
         # Depending on whether, or not it's been visited before,
         #  print either full description (first time visit) or brief description (every subsequent visit) of location
         print()
-        location.print_location_description()
+        curr_loc.print_location_description()
 
         # Win condition
         if game.check_win_condition():
@@ -292,11 +292,11 @@ if __name__ == "__main__":
         print(f"\n[Moves remaining: {game.player.moves_remaining}] [Score: {game.player.score}]")
         print("What to do? Choose from: look, inventory, score, log, quit")
         print("At this location, you can also:")
-        for action in location.available_commands:
+        for action in curr_loc.available_commands:
             print("-", action)
 
         # Show item-related commands
-        if location.items:
+        if curr_loc.items:
             print("  - take [item name]")
         if game.player.inventory:
             print("  - drop [item name]")
@@ -311,7 +311,7 @@ if __name__ == "__main__":
         valid_command = False
         if choice in menu:
             valid_command = True
-        elif choice in location.available_commands:
+        elif choice in curr_loc.available_commands:
             valid_command = True
         elif choice.startswith("take ") or choice.startswith("drop ") or choice.startswith("use "):
             valid_command = True
@@ -321,7 +321,7 @@ if __name__ == "__main__":
             choice = input("\nEnter action: ").lower().strip()
             if choice in menu:
                 valid_command = True
-            elif choice in location.available_commands:
+            elif choice in curr_loc.available_commands:
                 valid_command = True
             elif choice.startswith("take ") or choice.startswith("drop ") or choice.startswith("use "):
                 valid_command = True
@@ -334,14 +334,14 @@ if __name__ == "__main__":
             print("\n--- Game Log ---")
             game_log.display_events()
         elif choice == "look":
-            location.print_location_description(full=True)
+            curr_loc.print_location_description(full=True)
         elif choice == "inventory":
             if not game.player.inventory:
                 print("Your inventory is empty.")
             else:
                 print("You are carrying:")
-                for item in game.player.inventory:
-                    print(f" - {item.name}: {item.description}")
+                for inv_item in game.player.inventory:
+                    print(f" - {inv_item.name}: {inv_item.description}")
         elif choice == "score":
             print(f"Your current score is: {game.player.score}")
         elif choice == "quit":
@@ -349,8 +349,8 @@ if __name__ == "__main__":
             game.ongoing = False
 
         # Handle movement commands
-        elif choice in location.available_commands:
-            target_loc_id = location.available_commands[choice]
+        elif choice in curr_loc.available_commands:
+            target_loc_id = curr_loc.available_commands[choice]
             can_enter, block_msg = game.can_enter_location(target_loc_id)
             if can_enter:
                 game.current_location_id = target_loc_id
@@ -361,22 +361,22 @@ if __name__ == "__main__":
 
         # Handle take command
         elif choice.startswith("take "):
-            item_name = choice[5:].strip()
-            result = game.handle_take_command(item_name)
+            cmd_item_name = choice[5:].strip()
+            result = game.handle_take_command(cmd_item_name)
             print(result)
             game.decrement_moves()
 
         # Handle drop command
         elif choice.startswith("drop "):
-            item_name = choice[5:].strip()
-            result = game.handle_drop_command(item_name)
+            cmd_item_name = choice[5:].strip()
+            result = game.handle_drop_command(cmd_item_name)
             print(result)
             game.decrement_moves()
 
         # Handle use command
         elif choice.startswith("use "):
-            item_name = choice[4:].strip()
-            result = game.handle_use_command(item_name)
+            cmd_item_name = choice[4:].strip()
+            result = game.handle_use_command(cmd_item_name)
             print(result)
             game.decrement_moves()
 

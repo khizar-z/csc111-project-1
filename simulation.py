@@ -36,7 +36,6 @@ class AdventureGameSimulation:
     _game: AdventureGame
     _events: EventList
 
-    # TODO: Copy/paste your code from A1, and make adjustments as needed
     def __init__(self, game_data_file: str, initial_location_id: int, commands: list[str]) -> None:
         """
         Initialize a new game simulation based on the given game data, that runs through the given commands.
@@ -56,6 +55,39 @@ class AdventureGameSimulation:
         # Hint: Call self.generate_events with the appropriate arguments
         self.generate_events(commands, initial_location)
 
+    def _handle_take(self, command: str, current_location: Location) -> None:
+        """Handle a 'take' command during simulation, picking up an item at the current location."""
+        item_name = command[5:].strip()
+        if item_name in current_location.items:
+            current_location.items.remove(item_name)
+            item = self._game.get_item_by_name(item_name)
+            if item:
+                self._game.player.inventory.append(item)
+        if self._events.last is not None:
+            self._events.last.next_command = command
+
+    def _handle_drop(self, command: str, current_location: Location) -> None:
+        """Handle a 'drop' command during simulation, dropping an item at the current location."""
+        item_name = command[5:].strip()
+        inventory_names = self._game.get_inventory_names()
+        if item_name in inventory_names:
+            self._game.player.inventory = [i for i in self._game.player.inventory if i.name != item_name]
+            item = self._game.get_item_by_name(item_name)
+            if item and current_location.id_num != item.target_position:
+                current_location.items.append(item_name)
+        if self._events.last is not None:
+            self._events.last.next_command = command
+
+    def _handle_use(self, command: str, current_location: Location) -> None:
+        """Handle a 'use' command during simulation, using a special item like a key."""
+        item_name = command[4:].strip()
+        if item_name == "key" and current_location.id_num == 5:
+            office = self._game.get_location(8)
+            office.locked = False
+            self._game.player.inventory = [i for i in self._game.player.inventory if i.name != "key"]
+        if self._events.last is not None:
+            self._events.last.next_command = command
+
     def generate_events(self, commands: list[str], current_location: Location) -> None:
         """
         Generate events in this simulation, based on current_location and commands, a valid list of commands.
@@ -65,9 +97,6 @@ class AdventureGameSimulation:
         - all commands in the given list are valid commands when starting from current_location
         """
 
-        # TODO: Complete this method as specified. For each command, generate the event and add it to self._events.
-        # Hint: current_location.available_commands[command] will return the next location ID
-        # which executing <command> while in <current_location_id> leads to
         for command in commands:
             # Handle movement commands (go north/south/east/west)
             if command in current_location.available_commands:
@@ -75,50 +104,21 @@ class AdventureGameSimulation:
                 self._game.current_location_id = next_location_id
                 current_location = self._game.get_location()
 
-                # Create event for the new location
                 new_event = Event(current_location.id_num, current_location.long_description)
                 self._events.add_event(new_event, command)
 
-            # Handle non-movement commands (inventory, score, look, etc.)
-            # These don't change location, so we stay at current location
+            # Handle non-movement menu commands
             elif command in ["look", "inventory", "score", "log", "quit"]:
-                # These commands don't create a new location event
-                # But we record the command by updating the last event
                 if self._events.last is not None:
                     self._events.last.next_command = command
 
-            # Handle take commands
+            # Handle item commands via helper methods
             elif command.startswith("take "):
-                item_name = command[5:].strip()
-                if item_name in current_location.items:
-                    current_location.items.remove(item_name)
-                    item = self._game.get_item_by_name(item_name)
-                    if item:
-                        self._game.player.inventory.append(item)
-                if self._events.last is not None:
-                    self._events.last.next_command = command
-
-            # Handle drop commands
+                self._handle_take(command, current_location)
             elif command.startswith("drop "):
-                item_name = command[5:].strip()
-                inventory_names = self._game.get_inventory_names()
-                if item_name in inventory_names:
-                    self._game.player.inventory = [i for i in self._game.player.inventory if i.name != item_name]
-                    item = self._game.get_item_by_name(item_name)
-                    if item and current_location.id_num != item.target_position:
-                        current_location.items.append(item_name)
-                if self._events.last is not None:
-                    self._events.last.next_command = command
-
-            # Handle use commands
+                self._handle_drop(command, current_location)
             elif command.startswith("use "):
-                item_name = command[4:].strip()
-                if item_name == "key" and current_location.id_num == 5:
-                    office = self._game.get_location(8)
-                    office.locked = False
-                    self._game.player.inventory = [i for i in self._game.player.inventory if i.name != "key"]
-                if self._events.last is not None:
-                    self._events.last.next_command = command
+                self._handle_use(command, current_location)
 
     def get_id_log(self) -> list[int]:
         """
@@ -150,11 +150,11 @@ if __name__ == "__main__":
     # When you are ready to check your work with python_ta, uncomment the following lines.
     # (Delete the "#" and space before each line.)
     # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
-    # import python_ta
-    # python_ta.check_all(config={
-    #     'max-line-length': 120,
-    #     'disable': ['R1705', 'E9998', 'E9999', 'static_type_checker']
-    # })
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'disable': ['R1705', 'E9998', 'E9999', 'static_type_checker']
+    })
 
     win_walkthrough = [
         "go east",           # 0 -> 1 (Residence Hallway)

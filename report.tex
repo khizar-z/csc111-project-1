@@ -6,102 +6,195 @@
 \usepackage[margin=0.75in]{geometry}
 
 \title{CSC111 Winter 2026 Project 1}
-\author{TODO: FILL IN YOUR NAME(S) HERE}
+\author{Khizar Z., Safid M., Ali M.}
 \date{\today}
 
 \begin{document}
 \maketitle
 
 \section*{Running the game}
-We should be able to run your game by simply running \texttt{adventure.py}. If you have any other requirements (e.g., installing certain modules), describe them here. Otherwise, skip this section.
+Run \texttt{adventure.py} using Python 3.13.5. No additional libraries are required.
 
 \section*{Game Map}
-Example game map below (edit it to show your actual game map):
 
 \begin{verbatim}
-  1  2  3
- -1  4 -1
- -1  5 -1
+  0  1  2
+  3  4  5
+  6  7  8
 \end{verbatim}
 
-Starting location is: 1
+Starting location is: 0 (Dorm Room)
+
+\textbf{Legend:}
+\begin{itemize}
+    \item 0 = Dorm Room (starting location, deposit items here to win)
+    \item 1 = Residence Hallway
+    \item 2 = Campus Quad
+    \item 3 = Robarts Library 1F
+    \item 4 = Bahen Centre 1F
+    \item 5 = Coffee Shop (key location)
+    \item 6 = Robarts Study Room (USB drive location)
+    \item 7 = Lecture Hall (laptop charger location)
+    \item 8 = T.A. Office (lucky mug location, locked door)
+\end{itemize}
 
 \section*{Game solution}
-List of commands:
+List of commands to win (copy from \texttt{win\_walkthrough} in \texttt{simulation.py}):
+\begin{verbatim}
+["go east", "go south", "go west", "go south", "take usb drive",
+ "go north", "go east", "go south", "take laptop charger", "go north",
+ "go east", "take key", "use key", "go south", "take lucky mug",
+ "go north", "go north", "go west", "go west", "drop usb drive",
+ "drop laptop charger", "drop lucky mug"]
+\end{verbatim}
 
 \section*{Lose condition(s)}
 Description of how to lose the game:
+The player loses if they exhaust all 40 moves without collecting and depositing all required items (USB drive, laptop charger, lucky mug) at the Dorm Room.
 
-List of commands:
+List of commands (copy from \texttt{lose\_demo} in \texttt{simulation.py}):
+\begin{verbatim}
+["go east", "go west"] repeated 20 times (40 total moves)
+\end{verbatim}
 
 Which parts of your code are involved in this functionality:
-
-% Copy-paste the above if you have multiple lose conditions and describe each possible way to lose the game
+\begin{itemize}
+    \item \texttt{game\_entities.py}: \texttt{Player} class tracks \texttt{moves\_remaining}
+    \item \texttt{adventure.py}: \texttt{AdventureGame.check\_lose\_condition()} checks if moves are 0
+    \item \texttt{adventure.py}: \texttt{AdventureGame.decrement\_moves()} decreases moves after each action
+    \item \texttt{adventure.py}: Main game loop checks lose condition and displays game over
+\end{itemize}
 
 \section*{Inventory}
 
 \begin{enumerate}
 \item All location IDs that involve items in the game:
+\begin{itemize}
+    \item Location 5 (Coffee Shop): key
+    \item Location 6 (Robarts Study Room): usb drive
+    \item Location 7 (Lecture Hall): laptop charger
+    \item Location 8 (T.A. Office): lucky mug
+    \item Location 0 (Dorm Room): target deposit location for all 3 required items
+\end{itemize}
 
 \item Item data:
 \begin{enumerate}
-    \item For Item 1:
+    \item For USB Drive:
     \begin{itemize}
-    \item Item name:
-    \item Item start location ID:
-    \item Item target location ID:
+    \item Item name: usb drive
+    \item Item start location ID: 6
+    \item Item target location ID: 0
     \end{itemize}
-        \item For Item 2:
+    
+    \item For Laptop Charger:
     \begin{itemize}
-    \item Item name:
-    \item Item start location ID:
-    \item Item target location ID:
+    \item Item name: laptop charger
+    \item Item start location ID: 7
+    \item Item target location ID: 0
     \end{itemize}
-        \item For Item 3:
+    
+    \item For Lucky Mug:
     \begin{itemize}
-    \item Item name:
-    \item Item start location ID:
-    \item Item target location ID:
+    \item Item name: lucky mug
+    \item Item start location ID: 8
+    \item Item target location ID: 0
     \end{itemize}
-    % Copy-paste the above if you have more items, to list ALL items
+    
+    \item For Key (puzzle item):
+    \begin{itemize}
+    \item Item name: key
+    \item Item start location ID: 5
+    \item Item target location ID: -1 (no target, used to unlock door)
+    \end{itemize}
 \end{enumerate}
 
-    \item Exact command(s) that should be used to pick up an item (choose any one or more items for this example), and the command(s) used to use/drop the item (can copy the list you assigned to \texttt{inventory\_demo} in the \texttt{simulation.py} file)
-    \item Which parts of your code (file, class, function/method) are involved in handling the \texttt{inventory} command:
+\item Exact command(s) for inventory demonstration (copy from \texttt{inventory\_demo}):
+\begin{verbatim}
+["go east", "go south", "go south", "take laptop charger", "inventory",
+ "go north", "go west", "go south", "take usb drive", "inventory"]
+\end{verbatim}
+
+\item Which parts of code handle \texttt{inventory} command:
+\begin{itemize}
+    \item \texttt{game\_entities.py}: \texttt{Player.inventory} list stores \texttt{Item} objects
+    \item \texttt{adventure.py}: \texttt{AdventureGame.handle\_take\_command()} adds items to inventory
+    \item \texttt{adventure.py}: \texttt{AdventureGame.handle\_drop\_command()} removes items from inventory
+    \item \texttt{adventure.py}: Main game loop handles "inventory" menu command
+\end{itemize}
 \end{enumerate}
 
 \section*{Score}
 \begin{enumerate}
 
-    \item Briefly describe the way players can earn score in your game. Include the first location in which they can increase their score, and the exact list of command(s) leading up to the score increase:
+    \item Scoring system: Players earn points by:
+    \begin{itemize}
+        \item Picking up any item: +5 points
+        \item Depositing USB drive at Dorm Room: +30 points
+        \item Depositing laptop charger at Dorm Room: +30 points
+        \item Depositing lucky mug at Dorm Room: +40 points
+        \item Unlocking the T.A. Office door: +10 points
+    \end{itemize}
+    
+    First location to increase score: Location 7 (Lecture Hall) by picking up the laptop charger.
 
+    \item Copy of \texttt{scores\_demo}:
+\begin{verbatim}
+["go east", "go south", "go south", "take laptop charger", "score",
+ "go north", "go north", "go west", "drop laptop charger", "score"]
+\end{verbatim}
 
-    \item Copy the list you assigned to \texttt{scores\_demo} in the \texttt{simulation.py} file into this section of the report:
-
-
-    \item Which parts of your code (file, class, function/method) are involved in handling the \texttt{score} functionality:
+    \item Which parts of code handle \texttt{score} functionality:
+    \begin{itemize}
+        \item \texttt{game\_entities.py}: \texttt{Player.score} attribute
+        \item \texttt{adventure.py}: \texttt{AdventureGame.handle\_take\_command()} adds 5 points
+        \item \texttt{adventure.py}: \texttt{AdventureGame.handle\_drop\_command()} adds target points if at correct location
+        \item \texttt{adventure.py}: \texttt{AdventureGame.handle\_use\_command()} adds 10 points for unlocking door
+        \item \texttt{adventure.py}: Main game loop handles "score" menu command
+    \end{itemize}
 \end{enumerate}
 
 \section*{Enhancements}
 \begin{enumerate}
-    \item Describe your enhancement \#1 here
+    \item \textbf{Locked Door Puzzle}
     \begin{itemize}
-        \item Brief description of what the enhancement is (if it's a puzzle, also describe what steps the player must take to solve it):
-        \item Complexity level (choose from low/medium/high):
-        \item Reasons you believe this is the complexity level (e.g., mention implementation details, how much code did you have to add/change from the baseline, what challenges did you face, etc.)
-        \item Name the parts of the code which are involved in this enhancement
-        \item Copy the list you assigned to \texttt{enhancements\_demo} in the \texttt{simulation.py} file into this section of the report:
+        \item Brief description: The lucky mug is located in the T.A. Office (location 8), but the door is locked. The player must first find the key at the Coffee Shop (location 5), then use the ``use key'' command while at the Coffee Shop to unlock the door. After unlocking, the player can ``go south'' to enter the T.A. Office and retrieve the lucky mug.
+        
+        Steps to solve:
+        \begin{enumerate}
+            \item Navigate to Coffee Shop (location 5)
+            \item Pick up the key with ``take key''
+            \item Use the key with ``use key'' (unlocks the office door)
+            \item Enter the office with ``go south''
+            \item Pick up the mug with ``take lucky mug''
+        \end{enumerate}
+        
+        \item Complexity level: Medium
+        
+        \item Reasons for complexity level: This enhancement required:
+        \begin{itemize}
+            \item Adding a ``locked'' attribute to the Location class
+            \item Creating the \texttt{AdventureGame.handle\_use\_command()} function to process key usage
+            \item Creating the \texttt{AdventureGame.can\_enter\_location()} function to check locked status
+            \item Modifying the game loop to handle the ``use'' command
+            \item Tracking key consumption (removed from inventory after use)
+            \item Updating JSON data structure to include lock information
+        \end{itemize}
+        
+        \item Parts of code involved:
+        \begin{itemize}
+            \item \texttt{game\_entities.py}: \texttt{Location.locked} attribute
+            \item \texttt{adventure.py}: \texttt{AdventureGame.handle\_use\_command()} function
+            \item \texttt{adventure.py}: \texttt{AdventureGame.can\_enter\_location()} function
+            \item \texttt{game\_data.json}: ``locked'' field for T.A. Office location
+        \end{itemize}
+        
+        \item Copy of \texttt{enhancement\_demo}:
+\begin{verbatim}
+["go east", "go east", "go south", "take key", "use key", "go south",
+ "take lucky mug", "go north", "go north", "go west", "go west",
+ "drop lucky mug"]
+\end{verbatim}
     \end{itemize}
-
-    % Uncomment below section if you have more enhancements; copy-paste as needed
-    %\item Describe your enhancement here
-    %\begin{itemize}
-    %    \item Basic description of what the enhancement is:
-    %    \item Complexity level (low/medium/high):
-    %    \item Reasons you believe this is the complexity level (e.g., mention implementation details)
-    %    \item Name the parts of the code which are involved in this enhancement
-    %    \item Copy the list you assigned to \texttt{enhancements\_demo} in the \texttt{simulation.py} file into this section of the report:
-    %\end{itemize}
 \end{enumerate}
 
 

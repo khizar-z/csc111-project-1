@@ -31,6 +31,8 @@ WINNING_LOCATION = 0  # Dorm room where items must be deposited
 # Note: You may add helper functions, classes, etc. below as needed
 
 # I WANT TO MAKE CHANGE TO THE MAIN BRANCH
+
+
 class AdventureGame:
     """A text adventure game class storing all location, item and map data.
 
@@ -226,7 +228,7 @@ class AdventureGame:
                     office.locked = False
                     # Remove key from inventory
                     self.player.inventory = [i for i in game.player.inventory if i.name != "key"]
-                    self.player.score += 10  # Bonus for solving puzzle
+                    self.player.score += 40  # Bonus for solving puzzle
                     return "You unlock the T.A. office door with the key. The door swings open! +10 points!"
                 else:
                     return "The office door is already unlocked."
@@ -256,7 +258,7 @@ if __name__ == "__main__":
     # })
 
     game_log = EventList()  # This is REQUIRED as one of the baseline requirements
-    game = AdventureGame('game_data.json', 1)  # load data, setting initial location ID to 1
+    game = AdventureGame('game_data.json', 0)  # load data, setting initial location ID to 1
     menu = ["look", "inventory", "score", "log", "quit"]  # Regular menu options available at each location
     choice = None
 

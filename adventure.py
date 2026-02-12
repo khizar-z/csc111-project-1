@@ -167,91 +167,82 @@ class AdventureGame:
         """Decrement the player's remaining moves by 1."""
         self.player.moves_remaining -= 1
 
+    def handle_take_command(self, item_name: str) -> str:
+        """Handle the take command, picking up an item from the current location.
+        Returns a message describing the result.
+        """
+        location = self.get_location()
 
-def handle_take_command(game: AdventureGame, item_name: str) -> str:
-    """Handle the take command, picking up an item from the current location.
-    Returns a message describing the result.
-    """
-    location = game.get_location()
+        if item_name not in location.items:
+            return f"There is no {item_name} here."
 
-    if item_name not in location.items:
-        return f"There is no {item_name} here."
+        item = self.get_item_by_name(item_name)
+        if item is None:
+            return f"Unknown item: {item_name}"
 
-    item = game.get_item_by_name(item_name)
-    if item is None:
-        return f"Unknown item: {item_name}"
+        # Remove from location and add to inventory
+        location.items.remove(item_name)
+        self.player.inventory.append(item)
+        return f"You picked up the {item_name}."
 
-    # Remove from location and add to inventory
-    location.items.remove(item_name)
-    game.player.inventory.append(item)
-    return f"You picked up the {item_name}."
+    def handle_drop_command(self, item_name: str) -> str:
+        """Handle the drop command, dropping an item at the current location.
+        Awards points if dropped at the target location.
+        Returns a message describing the result.
+        """
+        inventory_names = self.get_inventory_names()
 
+        if item_name not in inventory_names:
+            return f"You don't have a {item_name} in your inventory."
 
-def handle_drop_command(game: AdventureGame, item_name: str) -> str:
-    """Handle the drop command, dropping an item at the current location.
-    Awards points if dropped at the target location.
-    Returns a message describing the result.
-    """
-    inventory_names = game.get_inventory_names()
+        item = self.get_item_by_name(item_name)
+        location = self.get_location()
 
-    if item_name not in inventory_names:
-        return f"You don't have a {item_name} in your inventory."
+        # Remove from inventory
+        self.player.inventory = [i for i in self.player.inventory if i.name != item_name]
 
-    item = game.get_item_by_name(item_name)
-    location = game.get_location()
-
-    # Remove from inventory
-    game.player.inventory = [i for i in game.player.inventory if i.name != item_name]
-
-    # Check if this is the target location
-    if location.id_num == item.target_position:
-        game.player.score += item.target_points
-        return f"You deposited the {item_name}. +{item.target_points} points!"
-    else:
-        # Just drop at current location
-        location.items.append(item_name)
-        return f"You dropped the {item_name}."
-
-
-def handle_use_command(game: AdventureGame, item_name: str) -> str:
-    """Handle the use command for special items like keys.
-    Returns a message describing the result.
-    """
-    if item_name not in game.get_inventory_names():
-        return f"You don't have a {item_name} in your inventory."
-
-    if item_name == "key":
-        # Check if at a location adjacent to the locked T.A. office (location 8)
-        location = game.get_location()
-        if location.id_num == 5:  # Coffee shop, adjacent to office
-            office = game.get_location(8)
-            if office.locked:
-                office.locked = False
-                # Remove key from inventory
-                game.player.inventory = [i for i in game.player.inventory if i.name != "key"]
-                game.player.score += 10  # Bonus for solving puzzle
-                return "You unlock the T.A. office door with the key. The door swings open! +10 points!"
-            else:
-                return "The office door is already unlocked."
+        # Check if this is the target location
+        if location.id_num == item.target_position:
+            self.player.score += item.target_points
+            return f"You deposited the {item_name}. +{item.target_points} points!"
         else:
-            return "There's nothing to unlock here."
-    else:
-        return f"You can't use the {item_name} here."
+            # Just drop at current location
+            location.items.append(item_name)
+            return f"You dropped the {item_name}."
 
+    def handle_use_command(self, item_name: str) -> str:
+        """Handle the use command for special items like keys.
+        Returns a message describing the result.
+        """
+        if item_name not in self.get_inventory_names():
+            return f"You don't have a {item_name} in your inventory."
 
-def print_location_description(location: Location, full: bool = False) -> None:
-    """Print the location description. If full=True or not visited before, print long description."""
-    if full or not location.visited:
-        print(location.long_description)
-        location.visited = True
-    else:
-        print(location.brief_description)
+        if item_name == "key":
+            # Check if at a location adjacent to the locked T.A. office (location 8)
+            location = self.get_location()
+            if location.id_num == 5:  # Coffee shop, adjacent to office
+                office = self.get_location(8)
+                if office.locked:
+                    office.locked = False
+                    # Remove key from inventory
+                    self.player.inventory = [i for i in game.player.inventory if i.name != "key"]
+                    self.player.score += 10  # Bonus for solving puzzle
+                    return "You unlock the T.A. office door with the key. The door swings open! +10 points!"
+                else:
+                    return "The office door is already unlocked."
+            else:
+                return "There's nothing to unlock here."
+        else:
+            return f"You can't use the {item_name} here."
 
-    # Show items at this location
-    if location.items:
-        print("\nYou see the following items here:")
-        for item in location.items:
-            print(f"  - {item}")
+    def can_enter_location(self, loc_id: int) -> tuple[bool, str]:
+        """Check if the player can enter the given location.
+        Returns (True, '') if allowed, or (False, reason_message) if blocked.
+        """
+        location = self.get_location(loc_id)
+        if location.locked:
+            return (False, "The door is locked! You need a key to enter.")
+        return (True, "")
 
 
 if __name__ == "__main__":
@@ -284,7 +275,7 @@ if __name__ == "__main__":
         # Depending on whether, or not it's been visited before,
         #  print either full description (first time visit) or brief description (every subsequent visit) of location
         print()
-        print_location_description(location)
+        location.print_location_description()
 
         # Win condition
         if game.check_win_condition():
@@ -341,7 +332,7 @@ if __name__ == "__main__":
             print("\n--- Game Log ---")
             game_log.display_events()
         elif choice == "look":
-            print_location_description(location, full=True)
+            location.print_location_description(full=True)
         elif choice == "inventory":
             if not game.player.inventory:
                 print("Your inventory is empty.")
@@ -357,26 +348,33 @@ if __name__ == "__main__":
 
         # Handle movement commands
         elif choice in location.available_commands:
-            self.current_location_id = location.available_commands[choice]
+            target_loc_id = location.available_commands[choice]
+            can_enter, block_msg = game.can_enter_location(target_loc_id)
+            if can_enter:
+                game.current_location_id = target_loc_id
+                game.decrement_moves()
+            else:
+                print(block_msg)
+                game.decrement_moves()
 
         # Handle take command
         elif choice.startswith("take "):
             item_name = choice[5:].strip()
-            result = handle_take_command(game, item_name)
+            result = game.handle_take_command(item_name)
             print(result)
             game.decrement_moves()
 
         # Handle drop command
         elif choice.startswith("drop "):
             item_name = choice[5:].strip()
-            result = handle_drop_command(game, item_name)
+            result = game.handle_drop_command(item_name)
             print(result)
             game.decrement_moves()
 
         # Handle use command
         elif choice.startswith("use "):
             item_name = choice[4:].strip()
-            result = handle_use_command(game, item_name)
+            result = game.handle_use_command(item_name)
             print(result)
             game.decrement_moves()
 

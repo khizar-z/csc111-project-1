@@ -47,6 +47,20 @@ class Location:
     visited: bool = False
     locked: bool = False
 
+    def print_location_description(self, full: bool = False) -> None:
+        """Print the location description. If full=True or not visited before, print long description."""
+        if full or not self.visited:
+            print(self.long_description)
+            self.visited = True
+        else:
+            print(self.brief_description)
+
+        # Show items at this location
+        if self.items:
+            print("\nYou see the following items here:")
+            for item in self.items:
+                print(f"  - {item}")
+
 
 @dataclass
 class Item:
